@@ -5,7 +5,7 @@ using LeagueSharp.Common;
 
 
 
-namespace RustysRengar
+namespace ChadsRengar
 {
     internal class Program
     {
@@ -28,7 +28,7 @@ namespace RustysRengar
     {
         if (args == null) throw new ArgumentNullException("args");
     }
-
+    
         private static void Game_OnGameLoad(EventArgs args1)
         {
             throw new NotImplementedException();
