@@ -12,3 +12,4 @@ c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\
 c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\x86\Debug\LeagueSharp.xml
 c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\obj\x86\Debug\ChadsRengo.exe
 c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\obj\x86\Debug\ChadsRengo.pdb
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\obj\x86\Debug\ChadsRengo.csprojResolveAssemblyReference.cache
