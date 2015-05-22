@@ -1,0 +1,15 @@
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\ChadsRengo.exe.config
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\obj\Debug\ChadsRengo.csprojResolveAssemblyReference.cache
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\ChadsRengo.exe
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\ChadsRengo.pdb
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\LeagueSharp.Common.dll
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\LeagueSharp.dll
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\LeagueSharp.SDK.dll
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\SharpDX.dll
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\SharpDX.Direct3D9.dll
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\clipper_library.dll
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\LeagueSharp.Sandbox.dll
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\Newtonsoft.Json.dll
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\bin\Debug\LeagueSharp.xml
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\obj\Debug\ChadsRengo.exe
+c:\users\intentions\documents\visual studio 2013\Projects\ChadsRengo\ChadsRengo\obj\Debug\ChadsRengo.pdb
