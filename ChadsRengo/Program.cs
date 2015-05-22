@@ -1,180 +1,211 @@
+/**
+ * 
+ * GoldenGates coded this whole thing.
+ * 
+ * 
+ **/
 using System;
-using System.Linq;
+
 using LeagueSharp;
 using LeagueSharp.Common;
+using Color = System.Drawing.Color;
+using ChadsRengo;
 
-
-
-namespace ChadsRengar
+namespace AssemblySkeleton
 {
-    internal class Program
+    class Program
     {
-        public static Menu Menu { get; set; }
 
-        private static Obj_AI_Hero Player
+        #region Declaration
+        static Spell Q, W, E;
+        static SpellSlot IgniteSlot;
+        static Items.Item HealthPot;
+        static Items.Item ManaPot;
+        static Orbwalking.Orbwalker Orbwalker;
+        static Menu Menu;
+        static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+        public const string Rengar = "MY_CHAMPION_NAME";
+        #endregion
+
+        static void Game_OnGameLoad(EventArgs args)
         {
-            get
-            {
-                return ObjectManager.Player;
-            }
-        }
+            if (Player.ChampionName != Rengar)
+                return;
 
-        private static Orbwalking.Orbwalker orbwalker;
+            /**EDIT SPELL VALUES BASED ON YOUR CHAMPION**/
+            #region Spells
+            Q = new Spell(SpellSlot.Q,0);
+            W = new Spell(SpellSlot.W);
+            W.SetSkillshot(0.6f, (float)(80 * Math.PI / 180), float.MaxValue, false, SkillshotType.SkillshotCircle);
+            E = new Spell(SpellSlot.E);
+            E.SetSkillshot(0.25f, 50f, 1000f, false, SkillshotType.SkillshotLine);
+            #endregion
+            /**EDIT SPELL VALUES BASED ON YOUR CHAMPION**/
 
-        private static Spell q, w, e;
+            #region Items
+            IgniteSlot = Player.GetSpellSlot("summonerdot");
+            HealthPot = new Items.Item(2003, 0);
+            ManaPot = new Items.Item(2004, 0);
+            #endregion
 
+            /**EDIT MENU BASED ON YOUR LIKING**/
+            #region Menu
+            Menu = new Menu("ForChads", Player.ChampionName, true);
 
-    private static void Main(string[] args)
-    {
-        if (args == null) throw new ArgumentNullException("args");
-    }
-    
-        private static void Game_OnGameLoad(EventArgs args1)
-        {
-            throw new NotImplementedException();
-        }
+            Menu OrbwalkerMenu = Menu.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
+            Orbwalker = new Orbwalking.Orbwalker(OrbwalkerMenu);
 
-        private static void Game_OnGameLoad(EventArgs args, DrawingDraw drawingOnDraw)
-        {
-            if (Player.ChampionName != "Rengar") return;
+            Menu TargetSelectorMenu = Menu.AddSubMenu(new Menu("Target Selector", "TargetSelector"));
+            TargetSelector.AddToMenu(TargetSelectorMenu);
 
-            q = new Spell(SpellSlot.Q, 0f);
-            w = new Spell(SpellSlot.W, 500f);
-            e = new Spell(SpellSlot.E, 950f);
+            Menu.AddItem(new MenuItem("AutoLevel", "Auto Level").SetValue<bool>(true));
 
-            q.SetTargetted(0.5f, 200f);
-            e.SetSkillshot(0.5f, 10f, float.MaxValue, false, SkillshotType.SkillshotLine);
-            w.SetSkillshot(0.5f, 150f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Menu ComboMenu = Menu.AddSubMenu(new Menu("Combo", "Combo"));
+            ComboMenu.AddItem(new MenuItem("ComboUseQ", "Use Q").SetValue(true));
+            ComboMenu.AddItem(new MenuItem("ComboUseW", "Use W").SetValue(true));
+            ComboMenu.AddItem(new MenuItem("ComboUseE", "Use E").SetValue(true));
+            ComboMenu.AddItem(new MenuItem("ComboUseIgnite", "Use Ignite").SetValue(true));
 
-            Menu = new Menu(Player.ChampionName, Player.ChampionName, true);
+            Menu HarassMenu = Menu.AddSubMenu(new Menu("Harass", "Harass"));
+            HarassMenu.AddItem(new MenuItem("HarassUseQ", "Use Q").SetValue(true));
+            HarassMenu.AddItem(new MenuItem("HarassUseW", "Use W").SetValue(true));
+            HarassMenu.AddItem(new MenuItem("HarassUseE", "Use E").SetValue(true));
+            HarassMenu.AddItem(new MenuItem("HarassManaManager", "Mana Manager (%)").SetValue(new Slider(40, 1, 100)));
 
-            Menu orbwalkerMenu = Menu.AddSubMenu(new Menu("Orbwalker", "Orbwalker"));
-            orbwalker = new Orbwalking.Orbwalker(orbwalkerMenu);
+            Menu LaneClearMenu = Menu.AddSubMenu(new Menu("Lane Clear", "LaneClear"));
+            LaneClearMenu.AddItem(new MenuItem("LaneClearUseQ", "Use Q").SetValue(true));
+            LaneClearMenu.AddItem(new MenuItem("LaneClearUseW", "Use W").SetValue(true));
+            LaneClearMenu.AddItem(new MenuItem("LaneClearUseE", "Use E").SetValue(true));
+            LaneClearMenu.AddItem(new MenuItem("LaneClearManaManager", "Mana Manager (%)").SetValue(new Slider(40, 1, 100)));
 
-            Menu ts = Menu.AddSubMenu(new Menu("Target Selector", "Target Selector"));
-            TargetSelector.AddToMenu(ts);
+            Menu ItemsMenu = Menu.AddSubMenu(new Menu("Items", "Items"));
+            ItemsMenu.AddItem(new MenuItem("ItemUseHealthPot", "Use Health Potion").SetValue(true));
+            ItemsMenu.AddItem(new MenuItem("ItemHealthManager", "Activate at Health (%)").SetValue(new Slider(30, 1, 100)));
+            ItemsMenu.AddItem(new MenuItem("ItemUseManaPot", "Use Mana Potion").SetValue(true));
+            ItemsMenu.AddItem(new MenuItem("ItemManaManager", "Activate at Mana (%)").SetValue(new Slider(30, 1, 100)));
 
-            Menu spellMenu = Menu.AddSubMenu(new Menu("Spells", "Spells"));
-            spellMenu.AddItem(new MenuItem("useQ", "Use Q").SetValue(true));
-            spellMenu.AddItem(new MenuItem("useW", "Use W").SetValue(true));
-            spellMenu.AddItem(new MenuItem("useE", "Use E").SetValue(true));
-
-            Menu comboMenu = Menu.AddSubMenu(new Menu("Combo", "Combo"));
-            comboMenu.AddItem(new MenuItem("useQ", "Use Q").SetValue(true));
-            comboMenu.AddItem(new MenuItem("useW", "Use W").SetValue(true));
-            comboMenu.AddItem(new MenuItem("useE", "Use E").SetValue(true));
-            comboMenu.AddItem(new MenuItem("Combo", "Combo").SetValue(new KeyBind(32, KeyBindType.Press)));
-
-            Menu mixedMenu = Menu.AddSubMenu(new Menu("Harass", "Harass"));
-            mixedMenu.AddItem(new MenuItem("useQHarass", "Use Q").SetValue(true));
-            mixedMenu.AddItem(new MenuItem("Harass", "Harass").SetValue(new KeyBind('C', KeyBindType.Press)));
+            Menu DrawingMenu = Menu.AddSubMenu(new Menu("Drawing", "Drawing"));
+            DrawingMenu.AddItem(new MenuItem("drawAA", "Draw AA Range").SetValue(true));
+            DrawingMenu.AddItem(new MenuItem("DrawQ", "Draw Q Range").SetValue(true));
+            DrawingMenu.AddItem(new MenuItem("DrawW", "Draw W Range").SetValue(true));
+            DrawingMenu.AddItem(new MenuItem("DrawE", "Draw E Range").SetValue(true));
 
             Menu.AddToMainMenu();
-            Drawing.OnDraw += drawingOnDraw;
-            Game.OnUpdate += Game_OnGameUpdate;
-            // Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+            #endregion
+            /**EDIT MENU BASED ON YOUR LIKING**/
+
+            /**EDIT SUBSCRIPTIONS BASED ON YOUR LIKING**/
+            #region Subscriptions
+            Drawing.OnDraw += Drawing_OnDraw;
+            Game.OnUpdate += Game_OnUpdate;
+            Game.OnProcessPacket += Game_OnProcessPacket;
+            Game.OnSendPacket += Game_OnSendPacket;
+            #endregion
+            /**EDIT SUBSCRIPTIONS BASED ON YOUR LIKING**/
+        }
+
+        static void Game_OnSendPacket(GamePacketEventArgs args)
+        {
+            //Runs when package is sent
+            //Not used often in scrub assemblies
 
         }
 
-        private static void Interrupter2_OnInterruptableTarget(
-            Obj_AI_Hero sender,
-            Interrupter2.InterruptableTargetEventArgs args)
+        static void Game_OnProcessPacket(GamePacketEventArgs args)
         {
-            if (sender.IsEnemy && sender.Distance(Player) < q.Range)
-            {
-                q.CastOnUnit(sender);
-            }
+            //Run when a packet is processed
+            //Not used often in scrub assemblies
         }
 
-        //static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        //{
-        //    if (sender is Obj_AI_Hero && sender.IsEnemy && sender.Distance(Player) < Q.Range)
-        //    {
-        //        Console.WriteLine("Spell Name: {0}  Channel Duration: {1}",args.SData.Name,args.SData.c);
-        //        if(args.SData.ChannelDuration > .35)
-        //        {
-        //            Q.CastOnUnit(sender);
-        //        }
-        //    }
-        //}
-
-
-        private static void Game_OnGameUpdate(EventArgs args)
+        static void Game_OnUpdate(EventArgs args)
         {
-            if (Player.IsDead) return;
-
-            if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
-            {
-                Savagery(null);
-                Battleroar();
-                BolaStrike();
-            }
-
-            if (orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
-            {
-                Savagery(null);
-                Battleroar();
-                BolaStrike();
-            }
-
-        }
-
-        private static void Savagery(Obj_AI_Base target)
-        {
-            if (!Menu.Item("useQ").GetValue<bool>()) return;
-
-            if (!q.IsReady())
-            {
+            if (Player.IsDead)
                 return;
-            }
-            var enemies = ObjectManager.Get<Obj_AI_Hero>().Count(x => x.IsEnemy && x.Distance(Player, false) < 200);
 
+            Checks();
 
-            if (target.IsValidTarget(q.Range))
+            switch (Orbwalker.ActiveMode)
             {
-                q.CastOnUnit(target);
+              
+                case Orbwalking.OrbwalkingMode.Combo:
+                    Obj_AI_Hero Target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
+                    if (Menu.Item("comboUseQ").GetValue<bool>() && _Q.IsReady() && Target.IsValidTarget() && Player.Distance(Target.Position) < 300)
+                    { //300 is random value near Rango AA range
+                        _Q.Cast();
+                    }
+                    if (Menu.Item("comboUseW").GetValue<bool>() && _W.IsReady() && Target.IsValidTarget())
+                    {
+                        _W.Cast();
+                    }
+                    if (Menu.Item("comboUseE").GetValue<bool>() && _e.IsReady() && Target.IsValidTarget())
+                    {
+                        _E.Cast(Target);
+                    }
+                    break;
+                    
+                case Orbwalking.OrbwalkingMode.Mixed:
+                    if (Player.ManaPercent > Menu.Item("HarassManaManager").GetValue<Slider>().Value)
+                    {
+                        /**YOUR HARASS LOGIC GOES HERE**/
+                    }
+                    break;
+                case Orbwalking.OrbwalkingMode.LaneClear:
+                    if (Player.ManaPercent > Menu.Item("LaneClearManaManager").GetValue<Slider>().Value)
+                    {
+                        /**YOUR LANE CLEAR LOGIC GOES HERE**/
+                    }
+                    break;
+                case Orbwalking.OrbwalkingMode.LastHit:
+                    /**YOUR LAST HIT LOGIC GOES HERE (Eg. Cast if 2 or more die, etc.)**/
+                    break;
+                case Orbwalking.OrbwalkingMode.None:
+                    /**YOUR 'OTHER' LOGIC WHEN NOTHING IS HELD GOES HERE**/
+                    break;
             }
         }
 
-
-        private static void Battleroar()
+        static void Checks()
         {
-            if (!Menu.Item("useW").GetValue<bool>()) return;
-
-            if (w.IsReady())
+            if (Menu.Item("AutoLevel").GetValue<bool>())
             {
-                int enemies =
-                    ObjectManager.Get<Obj_AI_Hero>().Count(x => x.IsEnemy && x.Distance(Player, false) < 500);
-
-                if (enemies > 0)
+            }
+            else
+            {
+                AutoLevel.Disable();
+            }
+            if (Menu.Item("ItemUseHealthPot").GetValue<bool>() && Menu.Item("ItemHealthManager").GetValue<Slider>().Value > Player.HealthPercent)
+            {
+                if (Items.HasItem(HealthPot.Id) && Items.CanUseItem(HealthPot.Id) && !Player.HasBuff("RegenerationPotion", true))
                 {
-                    w.Cast();
+                    HealthPot.Cast();
+                }
+            }
+            if (Menu.Item("ItemUseManaPot").GetValue<bool>() && Menu.Item("ItemManaManager").GetValue<Slider>().Value > Player.HealthPercent)
+            {
+                if (Items.HasItem(ManaPot.Id) && Items.CanUseItem(ManaPot.Id))
+                { //Mana Pot Check Needed, :cat_lazy:
+                    ManaPot.Cast();
                 }
             }
         }
 
-
-        private static void BolaStrike()
+        static void Drawing_OnDraw(EventArgs args)
         {
-            if (!Menu.Item("useE").GetValue<bool>()) return;
+            /**EDIT FROM, RADIUS, AND COLOR VALUES**/
+            if (Menu.Item("DrawAA").GetValue<bool>())
+                Render.Circle.DrawCircle(Player.Position, Player.AttackRange, Color.Blue);
+            if (Menu.Item("DrawQ").GetValue<bool>())
+                Render.Circle.DrawCircle(Player.Position, Q.Range, Color.Blue);
+            if (Menu.Item("DrawW").GetValue<bool>())
+                Render.Circle.DrawCircle(Player.Position, W.Range, Color.Blue);
+            if (Menu.Item("DrawE").GetValue<bool>())
+                Render.Circle.DrawCircle(Player.Position, E.Range, Color.Blue);
+            /**EDIT FROM, RADIUS, AND COLOR VALUES**/
+        }
 
-            if (e.IsReady())
-            {
-                Obj_AI_Hero target = TargetSelector.GetTarget(1000f, TargetSelector.DamageType.Physical);
-
-                if (target.IsValidTarget(e.Range))
-                {
-                    e.Cast(target.Position);
-                }
-            }
+        static void Main(string[] args)
+        {
+            CustomEvents.Game.OnGameLoad += Game_OnGameLoad;
         }
     }
 }
-
-            
-
- 
-
-
-
